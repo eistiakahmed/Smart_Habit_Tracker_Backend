@@ -14,6 +14,27 @@ export interface IUser extends Document {
   verificationToken?: string;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  lastActive?: Date;
+
+  // Gamification fields
+  points: number;
+  level: number;
+  xp: number;
+  streakFreezes: number;
+  currentStreak: number;
+  longestStreak: number;
+  badges: Array<{
+    badgeId: string;
+    unlockedAt: Date;
+  }>;
+
+  // Social fields
+  bio?: string;
+  isPublicProfile: boolean;
+  friends: Types.ObjectId[];
+  pendingFriends: Types.ObjectId[];
+  blockedUsers: Types.ObjectId[];
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -72,6 +93,71 @@ const UserSchema = new Schema<IUser>(
     verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    lastActive: Date,
+
+    // Gamification fields
+    points: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    level: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
+    xp: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    streakFreezes: {
+      type: Number,
+      default: 1,
+      min: 0,
+    },
+    currentStreak: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    longestStreak: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    badges: {
+      type: [
+        {
+          badgeId: String,
+          unlockedAt: Date,
+        },
+      ],
+      default: [],
+    },
+
+    // Social fields
+    bio: {
+      type: String,
+      maxlength: 500,
+      trim: true,
+    },
+    isPublicProfile: {
+      type: Boolean,
+      default: false,
+    },
+    friends: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    pendingFriends: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    blockedUsers: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
   },
   {
     timestamps: true,

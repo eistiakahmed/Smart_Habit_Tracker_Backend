@@ -202,6 +202,34 @@ export interface UpdateGoalData {
   status?: GoalStatus;
 }
 
+export interface GoalFilter {
+  status?: GoalStatus;
+  category?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface GoalProgress {
+  goalId: string;
+  currentValue: number;
+  targetValue: number;
+  progress: number;
+  daysRemaining: number;
+  daysElapsed: number;
+  onTrack: boolean;
+  variance: {
+    absolute: number;
+    percent: number;
+  };
+  status: GoalStatus;
+  milestones: Array<{
+    percent: number;
+    value: number;
+    achieved: boolean;
+    achievedAt?: Date;
+  }>;
+}
+
 // Achievement Types
 export interface AchievementResponse {
   id: string;
@@ -316,18 +344,6 @@ export interface WeeklyReport {
   }>;
 }
 
-// Notification Types
-export interface NotificationResponse {
-  id: string;
-  userId: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  data?: Record<string, any>;
-  isRead: boolean;
-  createdAt: Date;
-}
-
 // Enums
 export enum Frequency {
   DAILY = 'DAILY',
@@ -346,14 +362,6 @@ export enum GoalStatus {
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   PAUSED = 'PAUSED',
-}
-
-export enum NotificationType {
-  HABIT_REMINDER = 'HABIT_REMINDER',
-  ACHIEVEMENT_UNLOCKED = 'ACHIEVEMENT_UNLOCKED',
-  GOAL_COMPLETED = 'GOAL_COMPLETED',
-  STREAK_MILESTONE = 'STREAK_MILESTONE',
-  WEEKLY_REPORT = 'WEEKLY_REPORT',
 }
 
 // Express Request Extension

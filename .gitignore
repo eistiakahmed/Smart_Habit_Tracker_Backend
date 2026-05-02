@@ -4,3 +4,7 @@ dist
 *.log
 coverage
 jest.config.js
+
+# Firebase service account (contains sensitive credentials)
+*firebase-adminsdk*.json
+smart-habit-firebase-adminsdk.json

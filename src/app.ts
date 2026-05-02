@@ -3,8 +3,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
 import config from '@/config/app';
 import routes from '@/routes';
+import swaggerSpec from '@/config/swagger';
 import { generalLimiter } from '@/middleware/rateLimit.middleware';
 import { errorHandler, notFoundHandler } from '@/middleware/error.middleware';
 import requestLogger from '@/middleware/logger.middleware';
@@ -41,6 +43,29 @@ const createApp = (): Application => {
 
   // API routes
   app.use('/api/v1', routes);
+
+  // Swagger JSON spec
+  app.get('/api/v1/docs.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
+
+  // Swagger UI Documentation
+  app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'none',
+      filter: true,
+      showRequestDuration: true,
+      syntaxHighlight: {
+        activate: true,
+        theme: 'monokai',
+      },
+    },
+    customSiteTitle: 'Smart Habit Tracker API Docs',
+    customCss: '.swagger-ui .topbar { display: none }',
+    customfavIcon: '/favicon.ico',
+  }));
 
   // Root endpoint
   app.get('/', (_req, res) => {
