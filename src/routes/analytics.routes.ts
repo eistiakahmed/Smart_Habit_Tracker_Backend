@@ -9,6 +9,27 @@ router.use(authenticate);
 
 /**
  * @swagger
+ * /api/v1/analytics/daily-progress:
+ *   get:
+ *     summary: Get daily progress report
+ *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Target date (defaults to today)
+ *     responses:
+ *       200:
+ *         description: Daily progress retrieved successfully
+ */
+router.get('/daily-progress', analyticsController.getDailyProgress);
+
+/**
+ * @swagger
  * /api/v1/analytics/weekly-report:
  *   get:
  *     summary: Get weekly analytics report

@@ -253,6 +253,49 @@ export interface UserAchievementResponse {
 }
 
 // Analytics Types
+export interface DailyProgress {
+  date: string;
+  summary: {
+    totalHabits: number;
+    completedHabits: number;
+    completionRate: number;
+    averageMood: number;
+    currentStreak: number;
+  };
+  habits: Array<{
+    habitId: string;
+    title: string;
+    category: string;
+    completed: boolean;
+    completedAt?: Date;
+    mood?: number;
+    note?: string;
+    streak: number;
+    icon?: string;
+    color: string;
+  }>;
+  hourlyBreakdown: Array<{
+    hour: number;
+    completed: number;
+  }>;
+  comparison: {
+    previousDay: {
+      date: string;
+      completionRate: number;
+      completed: number;
+    };
+    change: {
+      rate: number;
+      completed: number;
+    };
+  };
+  upcomingReminders: Array<{
+    habitId: string;
+    title: string;
+    reminderTime: string;
+  }>;
+}
+
 export interface DashboardStats {
   overview: {
     totalHabits: number;

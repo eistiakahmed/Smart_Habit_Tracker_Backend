@@ -5,6 +5,17 @@ import logger from '@/utils/logger';
 import ResponseUtil from '@/utils/response';
 
 class AnalyticsController {
+  async getDailyProgress(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const date = req.query.date ? new Date(req.query.date as string) : undefined;
+      const progress = await analyticsService.getDailyProgress(req.user!.id, date);
+      ResponseUtil.success(res, progress);
+    } catch (error: any) {
+      logger.error('Get daily progress error:', error);
+      ResponseUtil.serverError(res, 'Failed to fetch daily progress');
+    }
+  }
+
   async getWeeklyReport(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;

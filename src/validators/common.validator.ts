@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
+// MongoDB ObjectId validation regex (24 hex characters)
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+
 export const idParamSchema = z.object({
-  id: z.string().cuid('Invalid ID format'),
+  id: z.string().regex(objectIdRegex, 'Invalid ID format'),
 });
 
 export const paginationSchema = z.object({

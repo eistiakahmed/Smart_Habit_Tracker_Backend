@@ -67,6 +67,49 @@ interface ProductivityInsight {
   actionable?: boolean;
 }
 
+interface DailyProgress {
+  date: string;
+  summary: {
+    totalHabits: number;
+    completedHabits: number;
+    completionRate: number;
+    averageMood: number;
+    currentStreak: number;
+  };
+  habits: Array<{
+    habitId: string;
+    title: string;
+    category: string;
+    completed: boolean;
+    completedAt?: Date;
+    mood?: number;
+    note?: string;
+    streak: number;
+    icon?: string;
+    color: string;
+  }>;
+  hourlyBreakdown: Array<{
+    hour: number;
+    completed: number;
+  }>;
+  comparison: {
+    previousDay: {
+      date: string;
+      completionRate: number;
+      completed: number;
+    };
+    change: {
+      rate: number;
+      completed: number;
+    };
+  };
+  upcomingReminders: Array<{
+    habitId: string;
+    title: string;
+    reminderTime: string;
+  }>;
+}
+
 class AnalyticsService {
   async getWeeklyReport(userId: string, startDate?: Date, endDate?: Date): Promise<WeeklyReport> {
     try {
@@ -489,6 +532,138 @@ class AnalyticsService {
       return insights;
     } catch (error: any) {
       logger.error('Get productivity insights error:', error);
+      throw error;
+    }
+  }
+
+  async getDailyProgress(userId: string, targetDate?: Date): Promise<DailyProgress> {
+    try {
+      const user = await User.findById(userId).select('timezone');
+      const timezone = user?.timezone || 'UTC';
+
+      const today = targetDate || DateUtil.getUserTimezoneDate(new Date(), timezone);
+      const startOfDay = DateUtil.startOfDayInTimezone(today, timezone);
+      const endOfDay = DateUtil.endOfDayInTimezone(today, timezone);
+
+      // Previous day for comparison
+      const previousDay = DateUtil.addDaysInTimezone(today, -1, timezone);
+      const startOfPreviousDay = DateUtil.startOfDayInTimezone(previousDay, timezone);
+      const endOfPreviousDay = DateUtil.endOfDayInTimezone(previousDay, timezone);
+
+      const habits = await Habit.find({
+        userId: new Types.ObjectId(userId),
+        isActive: true,
+      }).lean();
+
+      const habitIds = habits.map((h) => h._id);
+
+      // Get today's logs
+      const todayLogs = await HabitLog.find({
+        habitId: { $in: habitIds },
+        userId: new Types.ObjectId(userId),
+        completedAt: { $gte: startOfDay, $lte: endOfDay },
+      }).lean();
+
+      // Get previous day's logs for comparison
+      const previousDayLogs = await HabitLog.find({
+        habitId: { $in: habitIds },
+        userId: new Types.ObjectId(userId),
+        completedAt: { $gte: startOfPreviousDay, $lte: endOfPreviousDay },
+      }).lean();
+
+      // Calculate summary
+      const completedHabits = todayLogs.length;
+      const totalHabits = habits.length;
+      const completionRate = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
+
+      const moodSum = todayLogs.reduce((sum, log) => sum + (log.mood || 0), 0);
+      const moodCount = todayLogs.filter((log) => log.mood).length;
+      const averageMood = moodCount > 0 ? moodSum / moodCount : 0;
+
+      const userStreak = await this.calculateOverallStreak(userId);
+
+      // Habits detail with completion status
+      const habitsDetail = await Promise.all(
+        habits.map(async (habit) => {
+          const log = todayLogs.find((l) => l.habitId.toString() === habit._id.toString());
+          const streakInfo = await this.calculateHabitStreak(habit._id.toString(), userId);
+
+          return {
+            habitId: habit._id.toString(),
+            title: habit.title,
+            category: habit.category,
+            completed: !!log,
+            completedAt: log?.completedAt,
+            mood: log?.mood,
+            note: log?.note,
+            streak: streakInfo.current,
+            icon: habit.icon,
+            color: habit.color,
+          };
+        })
+      );
+
+      // Hourly breakdown
+      const hourlyBreakdown: Array<{ hour: number; completed: number }> = [];
+      for (let hour = 0; hour < 24; hour++) {
+        const completedInHour = todayLogs.filter((log) => log.completedAt.getHours() === hour).length;
+        hourlyBreakdown.push({ hour, completed: completedInHour });
+      }
+
+      // Previous day comparison
+      const previousDayCompletionRate = totalHabits > 0 ? (previousDayLogs.length / totalHabits) * 100 : 0;
+
+      // Upcoming reminders (for today only if targetDate is today)
+      const upcomingReminders: Array<{
+        habitId: string;
+        title: string;
+        reminderTime: string;
+      }> = [];
+
+      const isTargetToday = DateUtil.isToday(today, timezone);
+      if (isTargetToday) {
+        const currentHour = new Date().getHours();
+        for (const habit of habits) {
+          if (habit.reminderTime) {
+            const [hour, minute] = habit.reminderTime.split(':').map(Number);
+            if (hour > currentHour || (hour === currentHour && minute >= new Date().getMinutes())) {
+              upcomingReminders.push({
+                habitId: habit._id.toString(),
+                title: habit.title,
+                reminderTime: habit.reminderTime,
+              });
+            }
+          }
+        }
+        upcomingReminders.sort((a, b) => a.reminderTime.localeCompare(b.reminderTime));
+      }
+
+      return {
+        date: today.toISOString().split('T')[0],
+        summary: {
+          totalHabits,
+          completedHabits,
+          completionRate,
+          averageMood,
+          currentStreak: userStreak.current,
+        },
+        habits: habitsDetail,
+        hourlyBreakdown,
+        comparison: {
+          previousDay: {
+            date: previousDay.toISOString().split('T')[0],
+            completionRate: previousDayCompletionRate,
+            completed: previousDayLogs.length,
+          },
+          change: {
+            rate: completionRate - previousDayCompletionRate,
+            completed: completedHabits - previousDayLogs.length,
+          },
+        },
+        upcomingReminders,
+      };
+    } catch (error: any) {
+      logger.error('Get daily progress error:', error);
       throw error;
     }
   }
