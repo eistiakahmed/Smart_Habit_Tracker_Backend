@@ -1,4 +1,4 @@
-import { JwtPayload } from '@/types';
+import { JwtPayload } from '../types';
 export declare class JwtUtil {
     static generateAccessToken(payload: Omit<JwtPayload, 'type' | 'exp'>): string;
     static generateRefreshToken(payload: Omit<JwtPayload, 'type' | 'exp'>): string;

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtUtil = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const app_1 = __importDefault(require("@/config/app"));
+const app_1 = __importDefault(require("../config/app"));
 class JwtUtil {
     static generateAccessToken(payload) {
         return jsonwebtoken_1.default.sign({ ...payload, type: 'access' }, app_1.default.jwt.secret, { expiresIn: app_1.default.jwt.expiresIn });

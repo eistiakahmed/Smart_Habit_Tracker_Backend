@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const User_1 = __importDefault(require("@/models/User"));
-const Session_1 = __importDefault(require("@/models/Session"));
-const password_1 = __importDefault(require("@/utils/password"));
-const jwt_1 = __importDefault(require("@/utils/jwt"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const User_1 = __importDefault(require("../models/User"));
+const Session_1 = __importDefault(require("../models/Session"));
+const password_1 = __importDefault(require("../utils/password"));
+const jwt_1 = __importDefault(require("../utils/jwt"));
+const logger_1 = __importDefault(require("../utils/logger"));
 class AuthService {
     async register(data) {
         try {

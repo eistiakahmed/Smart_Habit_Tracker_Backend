@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDB = exports.disconnectDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const logger_1 = __importDefault(require("../utils/logger"));
 const node_dns_1 = __importDefault(require("node:dns"));
 node_dns_1.default.setServers(['8.8.8.8', '8.8.4.4']);
 const connectDB = async () => {

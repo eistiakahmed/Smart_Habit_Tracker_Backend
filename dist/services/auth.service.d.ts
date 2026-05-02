@@ -1,4 +1,4 @@
-import { AuthResponse, CreateUserData, LoginData } from '@/types';
+import { AuthResponse, CreateUserData, LoginData } from '../types';
 declare class AuthService {
     register(data: CreateUserData): Promise<AuthResponse>;
     login(data: LoginData): Promise<AuthResponse>;

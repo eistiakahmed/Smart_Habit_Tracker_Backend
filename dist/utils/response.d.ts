@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { ApiError } from '@/types';
+import { ApiError } from '../types';
 export declare class ResponseUtil {
     static success<T>(res: Response, data?: T, message?: string, statusCode?: number): Response;
     static error(res: Response, error: string | ApiError, statusCode?: number, message?: string): Response;

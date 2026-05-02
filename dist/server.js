@@ -38,9 +38,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const app_1 = __importDefault(require("./app"));
-const app_2 = __importDefault(require("@/config/app"));
-const database_1 = __importStar(require("@/config/database"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const app_2 = __importDefault(require("./config/app"));
+const database_1 = __importStar(require("./config/database"));
+const logger_1 = __importDefault(require("./utils/logger"));
 const startServer = async () => {
     try {
         await (0, database_1.default)();

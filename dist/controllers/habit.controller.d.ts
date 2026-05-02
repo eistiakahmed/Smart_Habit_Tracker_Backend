@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthenticatedRequest } from '@/types';
+import { AuthenticatedRequest } from '../types';
 declare class HabitController {
     getAllHabits(req: AuthenticatedRequest, res: Response): Promise<void>;
     getHabitById(req: AuthenticatedRequest, res: Response): Promise<void>;

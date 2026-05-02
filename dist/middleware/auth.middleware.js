@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.optionalAuth = exports.authenticate = void 0;
-const jwt_1 = __importDefault(require("@/utils/jwt"));
-const response_1 = __importDefault(require("@/utils/response"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const jwt_1 = __importDefault(require("../utils/jwt"));
+const response_1 = __importDefault(require("../utils/response"));
+const logger_1 = __importDefault(require("../utils/logger"));
 const authenticate = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;

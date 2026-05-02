@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { CreateHabitData, UpdateHabitData, ToggleHabitData, HabitFilter, HabitStats, HabitProgress, HabitStreak, HabitResponse } from '@/types';
+import { CreateHabitData, UpdateHabitData, ToggleHabitData, HabitFilter, HabitStats, HabitProgress, HabitStreak, HabitResponse } from '../types';
 declare class HabitService {
     getAllHabits(userId: string, filter?: HabitFilter): Promise<{
         habits: HabitResponse[];
@@ -21,13 +21,13 @@ declare class HabitService {
         category: string;
         color: string;
         icon?: string;
-        frequency: import("@/models/Habit").Frequency;
+        frequency: import("../models/Habit").Frequency;
         targetDays: number;
         startDate: Date;
         endDate?: Date;
         reminderTime?: string;
         isActive: boolean;
-        difficulty: import("@/models/Habit").Difficulty;
+        difficulty: import("../models/Habit").Difficulty;
         createdAt: Date;
         updatedAt: Date;
         _id: Types.ObjectId;
@@ -50,13 +50,13 @@ declare class HabitService {
         category: string;
         color: string;
         icon?: string;
-        frequency: import("@/models/Habit").Frequency;
+        frequency: import("../models/Habit").Frequency;
         targetDays: number;
         startDate: Date;
         endDate?: Date;
         reminderTime?: string;
         isActive: boolean;
-        difficulty: import("@/models/Habit").Difficulty;
+        difficulty: import("../models/Habit").Difficulty;
         createdAt: Date;
         updatedAt: Date;
         _id: Types.ObjectId;

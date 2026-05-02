@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.notFoundHandler = exports.errorHandler = void 0;
-const response_1 = __importDefault(require("@/utils/response"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const response_1 = __importDefault(require("../utils/response"));
+const logger_1 = __importDefault(require("../utils/logger"));
 const errorHandler = (err, req, res, _next) => {
     logger_1.default.error('Error occurred:', {
         message: err.message,

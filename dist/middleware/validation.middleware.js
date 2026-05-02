@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validate = void 0;
 const zod_1 = require("zod");
-const response_1 = __importDefault(require("@/utils/response"));
-const logger_1 = __importDefault(require("@/utils/logger"));
+const response_1 = __importDefault(require("../utils/response"));
+const logger_1 = __importDefault(require("../utils/logger"));
 const validate = (schema, property = 'body') => async (req, res, next) => {
     try {
         const validatedData = await schema.parseAsync(req[property]);

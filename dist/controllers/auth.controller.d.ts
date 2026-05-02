@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthenticatedRequest } from '@/types';
+import { AuthenticatedRequest } from '../types';
 declare class AuthController {
     register(req: AuthenticatedRequest, res: Response): Promise<void>;
     login(req: AuthenticatedRequest, res: Response): Promise<void>;

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authLimiter = exports.generalLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const app_1 = __importDefault(require("@/config/app"));
+const app_1 = __importDefault(require("../config/app"));
 exports.generalLimiter = (0, express_rate_limit_1.default)({
     windowMs: app_1.default.rateLimit.windowMs,
     max: app_1.default.rateLimit.maxRequests,
