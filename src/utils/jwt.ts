@@ -3,19 +3,19 @@ import config from '@/config/app';
 import { JwtPayload } from '@/types';
 
 export class JwtUtil {
-  static generateAccessToken(payload: Omit<JwtPayload, 'type'>): string {
+  static generateAccessToken(payload: Omit<JwtPayload, 'type' | 'exp'>): string {
     return jwt.sign(
       { ...payload, type: 'access' },
       config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
     );
   }
 
-  static generateRefreshToken(payload: Omit<JwtPayload, 'type'>): string {
+  static generateRefreshToken(payload: Omit<JwtPayload, 'type' | 'exp'>): string {
     return jwt.sign(
       { ...payload, type: 'refresh' },
       config.jwt.refreshTokenSecret,
-      { expiresIn: config.jwt.refreshTokenExpiresIn }
+      { expiresIn: config.jwt.refreshTokenExpiresIn } as jwt.SignOptions
     );
   }
 

@@ -33,7 +33,9 @@ export interface PaginatedResponse<T> {
 export interface JwtPayload {
   userId: string;
   email: string;
+  username: string;
   type: 'access' | 'refresh';
+  exp?: number;
 }
 
 export interface TokenPair {
@@ -65,6 +67,11 @@ export interface CreateUserData {
   password: string;
   firstName?: string;
   lastName?: string;
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
 }
 
 export interface UpdateUserData {

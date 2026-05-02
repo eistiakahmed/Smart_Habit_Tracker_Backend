@@ -1,43 +1,43 @@
 import { addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
-import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { toZonedTime } from 'date-fns-tz';
 
 export class DateUtil {
   static getUserTimezoneDate(date: Date, timezone: string): Date {
-    return utcToZonedTime(date, timezone);
+    return toZonedTime(date, timezone);
   }
 
   static startOfDayInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return startOfDay(zonedDate);
   }
 
   static endOfDayInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return endOfDay(zonedDate);
   }
 
   static startOfWeekInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return startOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
   }
 
   static endOfWeekInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return endOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
   }
 
   static startOfMonthInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return startOfMonth(zonedDate);
   }
 
   static endOfMonthInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return endOfMonth(zonedDate);
   }
 
   static addDaysInTimezone(date: Date, days: number, timezone: string): Date {
-    const zonedDate = utcToZonedTime(date, timezone);
+    const zonedDate = toZonedTime(date, timezone);
     return addDays(zonedDate, days);
   }
 
@@ -55,10 +55,10 @@ export class DateUtil {
     );
   }
 
-  static formatDateForUser(date: Date, timezone: string, format: string = 'yyyy-MM-dd'): string {
-    const zonedDate = utcToZonedTime(date, timezone);
-    // Use date-fns format here
-    return format; // Placeholder, implement with date-fns format
+  static formatDateForUser(date: Date, timezone: string): string {
+    const zonedDate = toZonedTime(date, timezone);
+    // Import and use date-fns format if needed
+    return zonedDate.toISOString().split('T')[0]; // Simple implementation
   }
 
   static getStreakDates(completedDates: Date[], timezone: string): {

@@ -1,5 +1,5 @@
-import { Types, startOfDay, endOfDay } from 'mongoose';
-import Habit, { IHabit } from '@/models/Habit';
+import { Types } from 'mongoose';
+import Habit from '@/models/Habit';
 import HabitLog from '@/models/HabitLog';
 import User from '@/models/User';
 import DateUtil from '@/utils/date';
@@ -12,10 +12,21 @@ import {
   HabitStats,
   HabitProgress,
   HabitStreak,
+  HabitResponse,
+  Frequency,
+  Difficulty,
 } from '@/types';
 
 class HabitService {
-  async getAllHabits(userId: string, filter?: HabitFilter) {
+  async getAllHabits(userId: string, filter?: HabitFilter): Promise<{
+    habits: HabitResponse[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
     try {
       const where: any = { userId: new Types.ObjectId(userId) };
 
@@ -49,6 +60,9 @@ class HabitService {
           return {
             ...habit,
             id: habit._id.toString(),
+            userId: habit.userId?.toString() || userId,
+            frequency: habit.frequency as Frequency,
+            difficulty: habit.difficulty as Difficulty,
             stats,
             todayCompleted,
           };
@@ -70,7 +84,7 @@ class HabitService {
     }
   }
 
-  async getHabitById(habitId: string, userId: string) {
+  async getHabitById(habitId: string, userId: string): Promise<HabitResponse & { recentLogs: any[] }> {
     try {
       const habit = await Habit.findOne({
         _id: new Types.ObjectId(habitId),
@@ -90,6 +104,9 @@ class HabitService {
       return {
         ...habit,
         id: habit._id.toString(),
+        userId: habit.userId?.toString() || userId,
+        frequency: habit.frequency as Frequency,
+        difficulty: habit.difficulty as Difficulty,
         stats,
         recentLogs,
       };
@@ -402,7 +419,7 @@ class HabitService {
       const streakInfo = DateUtil.getStreakDates(completedDates, timezone);
 
       // Calculate milestones
-      const milestones = [
+      const milestones: Array<{ days: number; achieved: boolean; date?: string }> = [
         { days: 7, achieved: false },
         { days: 14, achieved: false },
         { days: 21, achieved: false },
