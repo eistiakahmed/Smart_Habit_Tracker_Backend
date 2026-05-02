@@ -1,4 +1,3 @@
 node_modules
 .env
 jest.config.js
-dist
