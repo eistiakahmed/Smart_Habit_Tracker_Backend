@@ -67,6 +67,7 @@ export interface CreateUserData {
   password: string;
   firstName?: string;
   lastName?: string;
+  avatar?: string;
 }
 
 export interface LoginData {
@@ -373,4 +374,6 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     username: string;
   };
+  file?: Express.Multer.File;
+  fileUploaded?: boolean;
 }

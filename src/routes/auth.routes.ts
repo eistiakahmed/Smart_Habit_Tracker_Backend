@@ -4,6 +4,7 @@ import { authenticate } from '@/middleware/auth.middleware';
 import { authLimiter } from '@/middleware/rateLimit.middleware';
 import validate from '@/middleware/validation.middleware';
 import { registerSchema, loginSchema, refreshTokenSchema, updateProfileSchema } from '@/validators/auth.validator';
+import { singleUpload } from '@/middleware/upload.middleware';
 
 const router = Router();
 
@@ -37,7 +38,7 @@ const router = Router();
  *       400:
  *         description: Validation error or user already exists
  */
-router.post('/register', authLimiter, validate(registerSchema), authController.register);
+router.post('/register', authLimiter, singleUpload('avatar'), authController.register);
 
 /**
  * @swagger
@@ -161,6 +162,6 @@ router.get('/me', authenticate, authController.getMe);
  *       401:
  *         description: Unauthorized
  */
-router.put('/profile', authenticate, validate(updateProfileSchema), authController.updateProfile);
+router.put('/profile', authenticate, singleUpload('avatar'), authController.updateProfile);
 
 export default router;

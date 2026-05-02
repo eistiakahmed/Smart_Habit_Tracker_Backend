@@ -33,6 +33,7 @@ class AuthService {
         passwordHash,
         firstName: data.firstName,
         lastName: data.lastName,
+        avatar: data.avatar,
         timezone: 'UTC',
       });
 
