@@ -1,6 +1,6 @@
 {
   "name": "smart-habit-tracker-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-level backend API for Smart Daily Habit & To-Do Tracker",
   "main": "dist/server.js",
   "scripts": {
