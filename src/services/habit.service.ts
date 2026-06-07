@@ -248,6 +248,7 @@ class HabitService {
       const log = await HabitLog.create({
         habitId: new Types.ObjectId(habitId),
         userId: new Types.ObjectId(userId),
+        completedAt: new Date(),
         note: data.note,
         mood: data.mood,
       });
