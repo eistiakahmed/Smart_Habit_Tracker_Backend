@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import habitController from '@/controllers/habit.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 import validate from '@/middleware/validation.middleware';
 import { createHabitSchema, updateHabitSchema, toggleHabitSchema } from '@/validators/habit.validator';
 import { idParamSchema as commonIdParamSchema } from '@/validators/common.validator';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All habit routes require authentication
 router.use(authenticate);

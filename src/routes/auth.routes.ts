@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import authController from '@/controllers/auth.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 import { authLimiter } from '@/middleware/rateLimit.middleware';
@@ -6,7 +6,7 @@ import validate from '@/middleware/validation.middleware';
 import { loginSchema, refreshTokenSchema } from '@/validators/auth.validator';
 import { singleUpload } from '@/middleware/upload.middleware';
 
-const router = Router();
+const router: RouterType = Router();
 
 /**
  * @swagger

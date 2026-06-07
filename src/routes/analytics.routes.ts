@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import analyticsController from '@/controllers/analytics.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All analytics routes require authentication
 router.use(authenticate);

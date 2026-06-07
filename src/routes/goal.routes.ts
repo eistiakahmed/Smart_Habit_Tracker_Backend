@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import goalController from '@/controllers/goal.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 import validate from '@/middleware/validation.middleware';
 import { createGoalSchema, updateGoalSchema, goalQuerySchema } from '@/validators/goal.validator';
 import { idParamSchema as commonIdParamSchema } from '@/validators/common.validator';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All goal routes require authentication
 router.use(authenticate);

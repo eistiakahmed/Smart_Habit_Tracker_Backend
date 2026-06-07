@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import socialController from '@/controllers/social.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 import { idParamSchema as commonIdParamSchema } from '@/validators/common.validator';
 import validate from '@/middleware/validation.middleware';
 import { z } from 'zod';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All social routes require authentication
 router.use(authenticate);
