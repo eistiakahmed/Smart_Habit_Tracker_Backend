@@ -351,8 +351,7 @@ class SocialService {
       }
 
       // Verify partner friendship as well
-      const partner = await User.findById(partnerId);
-      if (!partner || !partner.friends?.includes(new Types.ObjectId(userId))) {
+      if (!partner.friends?.includes(new Types.ObjectId(userId))) {
         throw new Error('Must be friends to become accountability partners');
       }
 
