@@ -87,6 +87,67 @@ const UserSchema = new mongoose_1.Schema({
     verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    lastActive: Date,
+    points: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    level: {
+        type: Number,
+        default: 1,
+        min: 1,
+    },
+    xp: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    streakFreezes: {
+        type: Number,
+        default: 1,
+        min: 0,
+    },
+    currentStreak: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    longestStreak: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    badges: {
+        type: [
+            {
+                badgeId: String,
+                unlockedAt: Date,
+            },
+        ],
+        default: [],
+    },
+    bio: {
+        type: String,
+        maxlength: 500,
+        trim: true,
+    },
+    isPublicProfile: {
+        type: Boolean,
+        default: false,
+    },
+    friends: [{
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
+    pendingFriends: [{
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
+    blockedUsers: [{
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
 }, {
     timestamps: true,
 });

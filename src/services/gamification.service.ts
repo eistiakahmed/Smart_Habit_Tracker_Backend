@@ -215,7 +215,7 @@ class GamificationService {
 
       // Award points and XP
       await this.awardPoints(userId, points, 'Habit completion');
-      const levelResult = await this.awardXP(userId, xp);
+      await this.awardXP(userId, xp);
 
       // Check for achievements
       const achievementResult = await achievementService.checkAndUnlockAchievements(userId);
@@ -238,7 +238,7 @@ class GamificationService {
     }
   }
 
-  async onGoalComplete(userId: string, goalId: string): Promise<{
+  async onGoalComplete(userId: string, _goalId: string): Promise<{
     pointsEarned: number;
     xpEarned: number;
     achievements: any[];

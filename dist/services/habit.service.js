@@ -192,6 +192,7 @@ class HabitService {
             const log = await HabitLog_1.default.create({
                 habitId: new mongoose_1.Types.ObjectId(habitId),
                 userId: new mongoose_1.Types.ObjectId(userId),
+                completedAt: new Date(),
                 note: data.note,
                 mood: data.mood,
             });

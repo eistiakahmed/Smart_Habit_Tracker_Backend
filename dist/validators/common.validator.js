@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dateRangeSchema = exports.paginationSchema = exports.idParamSchema = void 0;
 const zod_1 = require("zod");
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 exports.idParamSchema = zod_1.z.object({
-    id: zod_1.z.string().cuid('Invalid ID format'),
+    id: zod_1.z.string().regex(objectIdRegex, 'Invalid ID format'),
 });
 exports.paginationSchema = zod_1.z.object({
     page: zod_1.z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),

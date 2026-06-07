@@ -56,6 +56,7 @@ export interface CreateUserData {
     password: string;
     firstName?: string;
     lastName?: string;
+    avatar?: string;
 }
 export interface LoginData {
     email: string;
@@ -174,6 +175,32 @@ export interface UpdateGoalData {
     targetDate?: Date;
     status?: GoalStatus;
 }
+export interface GoalFilter {
+    status?: GoalStatus;
+    category?: string;
+    page?: number;
+    limit?: number;
+}
+export interface GoalProgress {
+    goalId: string;
+    currentValue: number;
+    targetValue: number;
+    progress: number;
+    daysRemaining: number;
+    daysElapsed: number;
+    onTrack: boolean;
+    variance: {
+        absolute: number;
+        percent: number;
+    };
+    status: GoalStatus;
+    milestones: Array<{
+        percent: number;
+        value: number;
+        achieved: boolean;
+        achievedAt?: Date;
+    }>;
+}
 export interface AchievementResponse {
     id: string;
     title: string;
@@ -191,6 +218,48 @@ export interface UserAchievementResponse {
     achievement: AchievementResponse;
     progress: number;
     unlockedAt?: Date;
+}
+export interface DailyProgress {
+    date: string;
+    summary: {
+        totalHabits: number;
+        completedHabits: number;
+        completionRate: number;
+        averageMood: number;
+        currentStreak: number;
+    };
+    habits: Array<{
+        habitId: string;
+        title: string;
+        category: string;
+        completed: boolean;
+        completedAt?: Date;
+        mood?: number;
+        note?: string;
+        streak: number;
+        icon?: string;
+        color: string;
+    }>;
+    hourlyBreakdown: Array<{
+        hour: number;
+        completed: number;
+    }>;
+    comparison: {
+        previousDay: {
+            date: string;
+            completionRate: number;
+            completed: number;
+        };
+        change: {
+            rate: number;
+            completed: number;
+        };
+    };
+    upcomingReminders: Array<{
+        habitId: string;
+        title: string;
+        reminderTime: string;
+    }>;
 }
 export interface DashboardStats {
     overview: {
@@ -280,16 +349,6 @@ export interface WeeklyReport {
         streak: number;
     }>;
 }
-export interface NotificationResponse {
-    id: string;
-    userId: string;
-    type: NotificationType;
-    title: string;
-    message: string;
-    data?: Record<string, any>;
-    isRead: boolean;
-    createdAt: Date;
-}
 export declare enum Frequency {
     DAILY = "DAILY",
     WEEKLY = "WEEKLY",
@@ -306,13 +365,6 @@ export declare enum GoalStatus {
     FAILED = "FAILED",
     PAUSED = "PAUSED"
 }
-export declare enum NotificationType {
-    HABIT_REMINDER = "HABIT_REMINDER",
-    ACHIEVEMENT_UNLOCKED = "ACHIEVEMENT_UNLOCKED",
-    GOAL_COMPLETED = "GOAL_COMPLETED",
-    STREAK_MILESTONE = "STREAK_MILESTONE",
-    WEEKLY_REPORT = "WEEKLY_REPORT"
-}
 import { Request } from 'express';
 export interface AuthenticatedRequest extends Request {
     user?: {
@@ -320,5 +372,7 @@ export interface AuthenticatedRequest extends Request {
         email: string;
         username: string;
     };
+    file?: Express.Multer.File;
+    fileUploaded?: boolean;
 }
 //# sourceMappingURL=index.d.ts.map

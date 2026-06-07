@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Habit, HabitLog, Goal, User } from '@/models';
+import { Habit, HabitLog, User } from '@/models';
 import DateUtil from '@/utils/date';
 import logger from '@/utils/logger';
 

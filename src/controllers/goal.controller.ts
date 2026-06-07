@@ -7,8 +7,9 @@ import ResponseUtil from '@/utils/response';
 class GoalController {
   async getAllGoals(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
+      const validStatuses = ['ACTIVE', 'PAUSED', 'COMPLETED', 'ABANDONED'];
       const filter = {
-        status: req.query.status as string | undefined,
+        status: req.query.status && validStatuses.includes(req.query.status as string) ? req.query.status as any : undefined,
         category: req.query.category as string | undefined,
         page: req.query.page ? parseInt(req.query.page as string) : undefined,
         limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,

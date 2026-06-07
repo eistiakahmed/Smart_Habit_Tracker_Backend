@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notification = exports.Session = exports.UserAchievement = exports.Achievement = exports.Goal = exports.HabitLog = exports.Habit = exports.User = void 0;
+exports.SocialActivity = exports.FriendRequest = exports.DailyChallenge = exports.Session = exports.UserAchievement = exports.Achievement = exports.Goal = exports.HabitLog = exports.Habit = exports.User = void 0;
 var User_1 = require("./User");
 Object.defineProperty(exports, "User", { enumerable: true, get: function () { return __importDefault(User_1).default; } });
 var Habit_1 = require("./Habit");
@@ -18,6 +18,10 @@ var UserAchievement_1 = require("./UserAchievement");
 Object.defineProperty(exports, "UserAchievement", { enumerable: true, get: function () { return __importDefault(UserAchievement_1).default; } });
 var Session_1 = require("./Session");
 Object.defineProperty(exports, "Session", { enumerable: true, get: function () { return __importDefault(Session_1).default; } });
-var Notification_1 = require("./Notification");
-Object.defineProperty(exports, "Notification", { enumerable: true, get: function () { return __importDefault(Notification_1).default; } });
+var DailyChallenge_1 = require("./DailyChallenge");
+Object.defineProperty(exports, "DailyChallenge", { enumerable: true, get: function () { return __importDefault(DailyChallenge_1).default; } });
+var FriendRequest_1 = require("./FriendRequest");
+Object.defineProperty(exports, "FriendRequest", { enumerable: true, get: function () { return __importDefault(FriendRequest_1).default; } });
+var SocialActivity_1 = require("./SocialActivity");
+Object.defineProperty(exports, "SocialActivity", { enumerable: true, get: function () { return __importDefault(SocialActivity_1).default; } });
 //# sourceMappingURL=index.js.map

@@ -117,6 +117,7 @@ class GoalService {
       return {
         ...goal.toObject(),
         id: goal._id.toString(),
+        userId: goal.userId.toString(),
         status: goal.status as GoalStatus,
         progress,
         daysRemaining,
@@ -162,6 +163,7 @@ class GoalService {
       return {
         ...goal.toObject(),
         id: goal._id.toString(),
+        userId: goal.userId.toString(),
         status: goal.status as GoalStatus,
         progress: finalProgress,
         daysRemaining,
@@ -201,6 +203,7 @@ class GoalService {
       return {
         ...goal.toObject(),
         id: goal._id.toString(),
+        userId: goal.userId.toString(),
         status: goal.status as GoalStatus,
         progress,
         daysRemaining,

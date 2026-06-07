@@ -6,6 +6,7 @@ export interface IAchievement extends Document {
     badgeColor: string;
     requirement: Record<string, any>;
     points: number;
+    xp: number;
     category: string;
     createdAt: Date;
 }

@@ -31,7 +31,7 @@ export const singleUpload = (fieldName: string) => {
           }
         }
 
-        next();
+        return next();
       } catch (error: any) {
         logger.error('Cloudinary upload error:', error);
         return res.status(500).json({

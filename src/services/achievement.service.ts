@@ -224,13 +224,15 @@ class AchievementService {
         unlockedIds.add(achievement._id.toString());
       }
 
-      const inProgress = allAchievements
-        .filter((a) => !unlockedIds.has(a._id.toString()))
-        .map((a) => ({
-          ...a,
-          id: a._id.toString(),
-          progress: this.calculateAchievementProgress(userId, a),
-        }));
+      const inProgress = await Promise.all(
+        allAchievements
+          .filter((a) => !unlockedIds.has(a._id.toString()))
+          .map(async (a) => ({
+            ...a,
+            id: a._id.toString(),
+            progress: await this.calculateAchievementProgress(userId, a),
+          }))
+      );
 
       return { unlocked, inProgress };
     } catch (error: any) {
@@ -257,7 +259,7 @@ class AchievementService {
           continue;
         }
 
-        const progress = this.calculateAchievementProgress(userId, achievement);
+        const progress = await this.calculateAchievementProgress(userId, achievement);
 
         if (progress >= 100) {
           // Unlock achievement
@@ -315,42 +317,42 @@ class AchievementService {
     }
   }
 
-  private calculateAchievementProgress(userId: string, achievement: any): number {
+  private async calculateAchievementProgress(userId: string, achievement: any): Promise<number> {
     const { requirement } = achievement;
 
     switch (requirement.type) {
       case 'first_habit':
-        return this.hasCompletedAnyHabit(userId) ? 100 : 0;
+        return (await this.hasCompletedAnyHabit(userId)) ? 100 : 0;
 
       case 'streak_days': {
-        const maxStreak = this.getUserMaxStreak(userId);
+        const maxStreak = await this.getUserMaxStreak(userId);
         return Math.min(100, (maxStreak / requirement.value) * 100);
       }
 
       case 'goals_completed': {
-        const completedGoals = this.getCompletedGoalsCount(userId);
+        const completedGoals = await this.getCompletedGoalsCount(userId);
         return Math.min(100, (completedGoals / requirement.value) * 100);
       }
 
       case 'perfect_week':
-        return this.hasPerfectWeek(userId) ? 100 : 0;
+        return (await this.hasPerfectWeek(userId)) ? 100 : 0;
 
       case 'habits_created': {
-        const habitsCreated = this.getHabitsCreatedCount(userId);
+        const habitsCreated = await this.getHabitsCreatedCount(userId);
         return Math.min(100, (habitsCreated / requirement.value) * 100);
       }
 
       case 'category_completions': {
-        const categoryCompletions = this.getCategoryCompletions(userId, requirement.category);
+        const categoryCompletions = await this.getCategoryCompletions(userId, requirement.category);
         return Math.min(100, (categoryCompletions / requirement.value) * 100);
       }
 
       case 'early_bird':
       case 'night_owl':
-        return this.getSpecialHabitCount(userId, requirement.type) >= requirement.value ? 100 : 0;
+        return (await this.getSpecialHabitCount(userId, requirement.type)) >= requirement.value ? 100 : 0;
 
       case 'level': {
-        const userLevel = this.getUserLevel(userId);
+        const userLevel = await this.getUserLevel(userId);
         return Math.min(100, (userLevel / requirement.value) * 100);
       }
 

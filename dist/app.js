@@ -8,8 +8,10 @@ const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const compression_1 = __importDefault(require("compression"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const app_1 = __importDefault(require("./config/app"));
 const routes_1 = __importDefault(require("./routes"));
+const swagger_1 = __importDefault(require("./config/swagger"));
 const rateLimit_middleware_1 = require("./middleware/rateLimit.middleware");
 const error_middleware_1 = require("./middleware/error.middleware");
 const logger_middleware_1 = __importDefault(require("./middleware/logger.middleware"));
@@ -29,6 +31,25 @@ const createApp = () => {
     app.use(logger_middleware_1.default);
     app.use('/api', rateLimit_middleware_1.generalLimiter);
     app.use('/api/v1', routes_1.default);
+    app.get('/api/v1/docs.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(swagger_1.default);
+    });
+    app.use('/api/v1/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default, {
+        swaggerOptions: {
+            persistAuthorization: true,
+            docExpansion: 'none',
+            filter: true,
+            showRequestDuration: true,
+            syntaxHighlight: {
+                activate: true,
+                theme: 'monokai',
+            },
+        },
+        customSiteTitle: 'Smart Habit Tracker API Docs',
+        customCss: '.swagger-ui .topbar { display: none }',
+        customfavIcon: '/favicon.ico',
+    }));
     app.get('/', (_req, res) => {
         res.json({
             success: true,

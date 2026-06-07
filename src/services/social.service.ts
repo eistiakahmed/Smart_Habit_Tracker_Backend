@@ -208,10 +208,10 @@ class SocialService {
 
       return requests.map((request) => ({
         id: request._id.toString(),
-        senderId: request.senderId._id.toString(),
-        senderName: request.senderId.username,
-        senderAvatar: request.senderId.avatar,
-        senderLevel: request.senderId.level,
+        senderId: (request.senderId as any)._id.toString(),
+        senderName: (request.senderId as any).username,
+        senderAvatar: (request.senderId as any).avatar,
+        senderLevel: (request.senderId as any).level,
         message: request.message,
         createdAt: request.createdAt,
       }));
@@ -284,9 +284,9 @@ class SocialService {
 
       return activities.map((activity) => ({
         id: activity._id.toString(),
-        userId: activity.userId._id.toString(),
-        username: activity.userId.username,
-        avatar: activity.userId.avatar,
+        userId: (activity.userId as any)._id.toString(),
+        username: (activity.userId as any).username,
+        avatar: (activity.userId as any).avatar,
         type: activity.type,
         data: activity.data,
         createdAt: activity.createdAt,

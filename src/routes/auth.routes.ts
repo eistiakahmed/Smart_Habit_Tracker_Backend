@@ -3,7 +3,7 @@ import authController from '@/controllers/auth.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 import { authLimiter } from '@/middleware/rateLimit.middleware';
 import validate from '@/middleware/validation.middleware';
-import { registerSchema, loginSchema, refreshTokenSchema, updateProfileSchema } from '@/validators/auth.validator';
+import { loginSchema, refreshTokenSchema } from '@/validators/auth.validator';
 import { singleUpload } from '@/middleware/upload.middleware';
 
 const router = Router();

@@ -67,7 +67,7 @@ class GamificationController {
   }
 
   // Achievements
-  async getAllAchievements(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getAllAchievements(_req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const achievements = await achievementService.getAllAchievements();
       ResponseUtil.success(res, { achievements });

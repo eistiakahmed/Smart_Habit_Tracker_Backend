@@ -7,6 +7,7 @@ export interface IAchievement extends Document {
   badgeColor: string;
   requirement: Record<string, any>;
   points: number;
+  xp: number;
   category: string;
   createdAt: Date;
 }
@@ -37,6 +38,10 @@ const AchievementSchema = new Schema<IAchievement>(
       required: true,
     },
     points: {
+      type: Number,
+      default: 0,
+    },
+    xp: {
       type: Number,
       default: 0,
     },

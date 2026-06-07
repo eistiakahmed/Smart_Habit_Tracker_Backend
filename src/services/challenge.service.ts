@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { DailyChallenge, User, Habit, HabitLog } from '@/models';
+import { DailyChallenge, Habit, HabitLog } from '@/models';
 import gamificationService from './gamification.service';
 import logger from '@/utils/logger';
 
@@ -347,14 +347,6 @@ class ChallengeService {
       }
 
       case 'early_completions': {
-        const count = await HabitLog.countDocuments({
-          userId: new Types.ObjectId(userId),
-          completedAt: {
-            $gte: challenge.startDate,
-            $lt: new Date(challenge.endDate).setDate(new Date(challenge.endDate).getDate() + 1),
-          },
-        });
-
         const earlyCompletions = await HabitLog.aggregate([
           {
             $match: {
@@ -458,8 +450,6 @@ class ChallengeService {
     if (days.length === 0) return 0;
 
     const sortedDays = days.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-    const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
 
     let streak = 0;
     let checkDate = new Date();

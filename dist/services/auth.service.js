@@ -30,6 +30,7 @@ class AuthService {
                 passwordHash,
                 firstName: data.firstName,
                 lastName: data.lastName,
+                avatar: data.avatar,
                 timezone: 'UTC',
             });
             const tokens = jwt_1.default.generateTokenPair({
