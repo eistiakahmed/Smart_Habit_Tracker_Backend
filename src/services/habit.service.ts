@@ -191,8 +191,9 @@ class HabitService {
         throw new Error('Habit not found');
       }
 
-      // Soft delete
-      await Habit.findByIdAndUpdate(habitId, { isActive: false });
+      // Soft delete using the found habit for security
+      habit.isActive = false;
+      await habit.save();
 
       logger.info(`Habit deleted: ${habitId}`);
     } catch (error: any) {

@@ -181,7 +181,7 @@ class AuthService {
   async updateProfile(userId: string, data: any) {
     try {
       const user = await User.findByIdAndUpdate(
-        userId,
+        new Types.ObjectId(userId),
         { $set: data },
         { new: true, runValidators: true }
       );

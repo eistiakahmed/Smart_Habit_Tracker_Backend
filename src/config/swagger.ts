@@ -315,7 +315,7 @@ const options: swaggerJsdoc.Options = {
             },
             status: {
               type: 'string',
-              enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'],
+              enum: ['ACTIVE', 'COMPLETED', 'FAILED', 'PAUSED'],
             },
             createdAt: {
               type: 'string',

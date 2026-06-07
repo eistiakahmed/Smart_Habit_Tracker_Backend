@@ -350,6 +350,12 @@ class SocialService {
         throw new Error('Must be friends to become accountability partners');
       }
 
+      // Verify partner friendship as well
+      const partner = await User.findById(partnerId);
+      if (!partner || !partner.friends?.includes(new Types.ObjectId(userId))) {
+        throw new Error('Must be friends to become accountability partners');
+      }
+
       // This is a simplified version - in production, you'd create a separate Partnership model
       // For now, we'll create social activities to mark the partnership
       await SocialActivity.create({

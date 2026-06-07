@@ -295,12 +295,22 @@ class AchievementService {
             progress,
           });
 
-          // Update progress if exists
-          const existing = existingUnlocked.find(
-            (ua) => ua.achievementId.toString() === achievement._id.toString()
-          );
-          if (existing) {
-            await UserAchievement.findByIdAndUpdate(existing._id, { progress });
+          // Create or update progress record
+          let progressRecord = await UserAchievement.findOne({
+            userId: new Types.ObjectId(userId),
+            achievementId: achievement._id,
+          });
+
+          if (progressRecord) {
+            progressRecord.progress = progress;
+            await progressRecord.save();
+          } else {
+            await UserAchievement.create({
+              userId: new Types.ObjectId(userId),
+              achievementId: achievement._id,
+              progress,
+              unlockedAt: new Date(), // Will be updated when fully unlocked
+            });
           }
         }
       }
