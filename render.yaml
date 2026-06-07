@@ -1,0 +1,15 @@
+# Render deployment configuration for Smart Habit Tracker Backend
+# This ensures proper build and deployment process
+
+services:
+  - type: web
+    name: smart-habit-tracker-backend
+    runtime: node
+    buildCommand: pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PNPM_VERSION
+        value: 9.0.0
+    healthCheckPath: /api/v1/health
