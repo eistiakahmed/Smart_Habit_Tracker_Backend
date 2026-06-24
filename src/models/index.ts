@@ -9,6 +9,8 @@ export { default as Session } from './Session';
 export { default as DailyChallenge } from './DailyChallenge';
 export { default as FriendRequest } from './FriendRequest';
 export { default as SocialActivity } from './SocialActivity';
+export { default as QuickNote } from './QuickNote';
+export { default as Category } from './Category';
 
 // Export types
 export type { IUser } from './User';
@@ -21,3 +23,5 @@ export type { ISession } from './Session';
 export type { IDailyChallenge, ChallengeType } from './DailyChallenge';
 export type { IFriendRequest, FriendRequestStatus } from './FriendRequest';
 export type { ISocialActivity, ActivityType } from './SocialActivity';
+export type { IQuickNote, NotePriority, NoteCategory } from './QuickNote';
+export type { ICategory } from './Category';

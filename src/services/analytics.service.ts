@@ -161,7 +161,7 @@ class AnalyticsService {
             total: totalDays,
             rate: totalDays > 0 ? (completed / totalDays) * 100 : 0,
             longestStreak: streakInfo.longest,
-            category: habit.category,
+            category: habit.category?.toString() || 'uncategorized',
           };
         })
       );
@@ -170,13 +170,14 @@ class AnalyticsService {
       const categoryMap = new Map<string, { completed: number; total: number }>();
 
       for (const habit of habits) {
-        const existing = categoryMap.get(habit.category) || { completed: 0, total: 0 };
+        const categoryKey = habit.category?.toString() || 'uncategorized';
+        const existing = categoryMap.get(categoryKey) || { completed: 0, total: 0 };
         existing.total += DateUtil.getDaysBetween(start, end);
 
         const habitLogs = logs.filter((log) => log.habitId.toString() === habit._id.toString());
         existing.completed += habitLogs.length;
 
-        categoryMap.set(habit.category, existing);
+        categoryMap.set(categoryKey, existing);
       }
 
       const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, data]) => ({
@@ -591,7 +592,7 @@ class AnalyticsService {
           return {
             habitId: habit._id.toString(),
             title: habit.title,
-            category: habit.category,
+            category: habit.category?.toString() || 'uncategorized',
             completed: !!log,
             completedAt: log?.completedAt,
             mood: log?.mood,
