@@ -7,7 +7,7 @@ import ResponseUtil from '@/utils/response';
 class AnalyticsController {
   async getDailyProgress(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const date = req.query.date ? new Date(req.query.date as string) : undefined;
+      const date = req.query.date as string | undefined;
       const progress = await analyticsService.getDailyProgress(req.user!.id, date);
       ResponseUtil.success(res, progress);
     } catch (error: any) {
@@ -18,8 +18,8 @@ class AnalyticsController {
 
   async getWeeklyReport(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
 
       const report = await analyticsService.getWeeklyReport(req.user!.id, startDate, endDate);
       ResponseUtil.success(res, report);

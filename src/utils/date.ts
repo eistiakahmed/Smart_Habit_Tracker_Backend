@@ -1,5 +1,5 @@
-import { addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { addDays, format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
+import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export class DateUtil {
   static getUserTimezoneDate(date: Date, timezone: string): Date {
@@ -7,38 +7,40 @@ export class DateUtil {
   }
 
   static startOfDayInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = toZonedTime(date, timezone);
-    return startOfDay(zonedDate);
+    const dateKey = this.formatDateForUser(date, timezone);
+    return fromZonedTime(`${dateKey}T00:00:00.000`, timezone);
   }
 
   static endOfDayInTimezone(date: Date, timezone: string): Date {
-    const zonedDate = toZonedTime(date, timezone);
-    return endOfDay(zonedDate);
+    const dateKey = this.formatDateForUser(date, timezone);
+    return fromZonedTime(`${dateKey}T23:59:59.999`, timezone);
   }
 
   static startOfWeekInTimezone(date: Date, timezone: string): Date {
     const zonedDate = toZonedTime(date, timezone);
-    return startOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
+    const weekStart = startOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
+    return fromZonedTime(`${format(weekStart, 'yyyy-MM-dd')}T00:00:00.000`, timezone);
   }
 
   static endOfWeekInTimezone(date: Date, timezone: string): Date {
     const zonedDate = toZonedTime(date, timezone);
-    return endOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
+    const weekEnd = endOfWeek(zonedDate, { weekStartsOn: 1 }); // Monday
+    return fromZonedTime(`${format(weekEnd, 'yyyy-MM-dd')}T23:59:59.999`, timezone);
   }
 
   static startOfMonthInTimezone(date: Date, timezone: string): Date {
     const zonedDate = toZonedTime(date, timezone);
-    return startOfMonth(zonedDate);
+    return fromZonedTime(`${format(startOfMonth(zonedDate), 'yyyy-MM-dd')}T00:00:00.000`, timezone);
   }
 
   static endOfMonthInTimezone(date: Date, timezone: string): Date {
     const zonedDate = toZonedTime(date, timezone);
-    return endOfMonth(zonedDate);
+    return fromZonedTime(`${format(endOfMonth(zonedDate), 'yyyy-MM-dd')}T23:59:59.999`, timezone);
   }
 
   static addDaysInTimezone(date: Date, days: number, timezone: string): Date {
     const zonedDate = toZonedTime(date, timezone);
-    return addDays(zonedDate, days);
+    return fromZonedTime(`${format(addDays(zonedDate, days), 'yyyy-MM-dd')}T00:00:00.000`, timezone);
   }
 
   static getDaysBetween(startDate: Date, endDate: Date): number {
@@ -46,19 +48,27 @@ export class DateUtil {
   }
 
   static isToday(date: Date, timezone: string): boolean {
-    const today = this.getUserTimezoneDate(new Date(), timezone);
-    const compareDate = this.getUserTimezoneDate(date, timezone);
-    return (
-      today.getDate() === compareDate.getDate() &&
-      today.getMonth() === compareDate.getMonth() &&
-      today.getFullYear() === compareDate.getFullYear()
-    );
+    return this.isSameDayInTimezone(new Date(), date, timezone);
+  }
+
+  static isSameDayInTimezone(a: Date, b: Date, timezone: string): boolean {
+    return this.formatDateForUser(a, timezone) === this.formatDateForUser(b, timezone);
   }
 
   static formatDateForUser(date: Date, timezone: string): string {
-    const zonedDate = toZonedTime(date, timezone);
-    // Import and use date-fns format if needed
-    return zonedDate.toISOString().split('T')[0]; // Simple implementation
+    return formatInTimeZone(date, timezone, 'yyyy-MM-dd');
+  }
+
+  static parseUserDate(date: Date | string | undefined, timezone: string): Date {
+    if (!date) {
+      return new Date();
+    }
+
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return fromZonedTime(`${date}T12:00:00.000`, timezone);
+    }
+
+    return new Date(date);
   }
 
   static getStreakDates(completedDates: Date[], timezone: string): {

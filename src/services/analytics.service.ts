@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { differenceInCalendarDays } from 'date-fns';
 import { Habit, HabitLog, User } from '@/models';
 import DateUtil from '@/utils/date';
 import logger from '@/utils/logger';
@@ -111,13 +112,17 @@ interface DailyProgress {
 }
 
 class AnalyticsService {
-  async getWeeklyReport(userId: string, startDate?: Date, endDate?: Date): Promise<WeeklyReport> {
+  async getWeeklyReport(userId: string, startDate?: Date | string, endDate?: Date | string): Promise<WeeklyReport> {
     try {
       const user = await User.findById(userId).select('timezone');
       const timezone = user?.timezone || 'UTC';
 
-      const start = startDate || DateUtil.startOfWeekInTimezone(new Date(), timezone);
-      const end = endDate || DateUtil.endOfWeekInTimezone(new Date(), timezone);
+      const start = startDate
+        ? DateUtil.startOfDayInTimezone(DateUtil.parseUserDate(startDate, timezone), timezone)
+        : DateUtil.startOfWeekInTimezone(new Date(), timezone);
+      const end = endDate
+        ? DateUtil.endOfDayInTimezone(DateUtil.parseUserDate(endDate, timezone), timezone)
+        : DateUtil.endOfWeekInTimezone(new Date(), timezone);
 
       const habits = await Habit.find({
         userId: new Types.ObjectId(userId),
@@ -194,8 +199,8 @@ class AnalyticsService {
 
       return {
         week: {
-          start: start.toISOString().split('T')[0],
-          end: end.toISOString().split('T')[0],
+          start: DateUtil.formatDateForUser(start, timezone),
+          end: DateUtil.formatDateForUser(end, timezone),
         },
         summary: {
           totalHabits: habits.length,
@@ -267,7 +272,7 @@ class AnalyticsService {
       }).lean();
 
       const totalDays = DateUtil.getDaysBetween(startOfMonth, today);
-      const activeDays = new Set(logs.map((log) => log.completedAt.toDateString())).size;
+      const activeDays = new Set(logs.map((log) => DateUtil.formatDateForUser(log.completedAt, timezone))).size;
 
       // Calculate streaks
       const userStreak = await this.calculateOverallStreak(userId);
@@ -277,11 +282,9 @@ class AnalyticsService {
       let currentDate = startOfMonth;
 
       while (currentDate <= today) {
-        const dayLogs = logs.filter(
-          (log) => log.completedAt.toDateString() === currentDate.toDateString()
-        );
+        const dayLogs = logs.filter((log) => DateUtil.isSameDayInTimezone(log.completedAt, currentDate, timezone));
         dailyTrends.push({
-          date: currentDate.toISOString().split('T')[0],
+          date: DateUtil.formatDateForUser(currentDate, timezone),
           completed: dayLogs.length,
           rate: habits.length > 0 ? (dayLogs.length / habits.length) * 100 : 0,
         });
@@ -366,6 +369,8 @@ class AnalyticsService {
 
   async getHabitPatterns(userId: string): Promise<HabitPattern[]> {
     try {
+      const user = await User.findById(userId).select('timezone');
+      const timezone = user?.timezone || 'UTC';
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -388,7 +393,10 @@ class AnalyticsService {
         // Completion by day of week
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const completionByDay = dayNames.map((day) => {
-          const dayLogs = logs.filter((log) => log.completedAt.toDateString().includes(day));
+          const dayLogs = logs.filter((log) => {
+            const zonedDate = DateUtil.getUserTimezoneDate(log.completedAt, timezone);
+            return dayNames[zonedDate.getDay()] === day;
+          });
           return {
             day,
             rate: logs.length > 0 ? (dayLogs.length / logs.length) * 100 : 0,
@@ -400,7 +408,7 @@ class AnalyticsService {
         // Completion by hour
         const hourCounts = new Map<number, number>();
         for (const log of logs) {
-          const hour = log.completedAt.getHours();
+          const hour = DateUtil.getUserTimezoneDate(log.completedAt, timezone).getHours();
           hourCounts.set(hour, (hourCounts.get(hour) || 0) + 1);
         }
 
@@ -537,12 +545,12 @@ class AnalyticsService {
     }
   }
 
-  async getDailyProgress(userId: string, targetDate?: Date): Promise<DailyProgress> {
+  async getDailyProgress(userId: string, targetDate?: Date | string): Promise<DailyProgress> {
     try {
       const user = await User.findById(userId).select('timezone');
       const timezone = user?.timezone || 'UTC';
 
-      const today = targetDate || DateUtil.getUserTimezoneDate(new Date(), timezone);
+      const today = DateUtil.parseUserDate(targetDate, timezone);
       const startOfDay = DateUtil.startOfDayInTimezone(today, timezone);
       const endOfDay = DateUtil.endOfDayInTimezone(today, timezone);
 
@@ -607,7 +615,9 @@ class AnalyticsService {
       // Hourly breakdown
       const hourlyBreakdown: Array<{ hour: number; completed: number }> = [];
       for (let hour = 0; hour < 24; hour++) {
-        const completedInHour = todayLogs.filter((log) => log.completedAt.getHours() === hour).length;
+        const completedInHour = todayLogs.filter((log) => (
+          DateUtil.getUserTimezoneDate(log.completedAt, timezone).getHours() === hour
+        )).length;
         hourlyBreakdown.push({ hour, completed: completedInHour });
       }
 
@@ -623,11 +633,12 @@ class AnalyticsService {
 
       const isTargetToday = DateUtil.isToday(today, timezone);
       if (isTargetToday) {
-        const currentHour = new Date().getHours();
+        const currentTime = DateUtil.getUserTimezoneDate(new Date(), timezone);
+        const currentHour = currentTime.getHours();
         for (const habit of habits) {
           if (habit.reminderTime) {
             const [hour, minute] = habit.reminderTime.split(':').map(Number);
-            if (hour > currentHour || (hour === currentHour && minute >= new Date().getMinutes())) {
+            if (hour > currentHour || (hour === currentHour && minute >= currentTime.getMinutes())) {
               upcomingReminders.push({
                 habitId: habit._id.toString(),
                 title: habit.title,
@@ -640,7 +651,7 @@ class AnalyticsService {
       }
 
       return {
-        date: today.toISOString().split('T')[0],
+        date: DateUtil.formatDateForUser(today, timezone),
         summary: {
           totalHabits,
           completedHabits,
@@ -652,7 +663,7 @@ class AnalyticsService {
         hourlyBreakdown,
         comparison: {
           previousDay: {
-            date: previousDay.toISOString().split('T')[0],
+            date: DateUtil.formatDateForUser(previousDay, timezone),
             completionRate: previousDayCompletionRate,
             completed: previousDayLogs.length,
           },
@@ -680,15 +691,13 @@ class AnalyticsService {
     let currentDate = start;
 
     while (currentDate <= end) {
-      const dayLogs = logs.filter(
-        (log) => log.completedAt.toDateString() === currentDate.toDateString()
-      );
+      const dayLogs = logs.filter((log) => DateUtil.isSameDayInTimezone(log.completedAt, currentDate, timezone));
 
       const moodSum = dayLogs.reduce((sum, log) => sum + (log.mood || 0), 0);
       const moodCount = dayLogs.filter((log) => log.mood).length;
 
       dailyStats.push({
-        date: currentDate.toISOString().split('T')[0],
+        date: DateUtil.formatDateForUser(currentDate, timezone),
         completed: dayLogs.length,
         total: totalHabits,
         rate: totalHabits > 0 ? (dayLogs.length / totalHabits) * 100 : 0,
@@ -710,7 +719,7 @@ class AnalyticsService {
     for (const daily of dailyTrends) {
       const date = new Date(daily.date);
       const weekStart = DateUtil.startOfWeekInTimezone(date, timezone);
-      const weekKey = weekStart.toISOString().split('T')[0];
+      const weekKey = DateUtil.formatDateForUser(weekStart, timezone);
 
       const existing = weeklyMap.get(weekKey) || { completed: 0, count: 0 };
       existing.completed += daily.completed;
@@ -737,19 +746,20 @@ class AnalyticsService {
       .limit(365)
       .lean();
 
-    const dates = logs.map((log) => log.completedAt.toDateString());
+    const user = await User.findById(userId).select('timezone');
+    const timezone = user?.timezone || 'UTC';
+    const dates = logs.map((log) => DateUtil.formatDateForUser(log.completedAt, timezone));
 
     let currentStreak = 0;
-    const today = new Date().toDateString();
+    const today = DateUtil.formatDateForUser(new Date(), timezone);
 
     if (dates.includes(today)) {
       currentStreak = 1;
-      let checkDate = new Date();
-      checkDate.setDate(checkDate.getDate() - 1);
+      let checkDate = DateUtil.addDaysInTimezone(new Date(), -1, timezone);
 
-      while (dates.includes(checkDate.toDateString())) {
+      while (dates.includes(DateUtil.formatDateForUser(checkDate, timezone))) {
         currentStreak++;
-        checkDate.setDate(checkDate.getDate() - 1);
+        checkDate = DateUtil.addDaysInTimezone(checkDate, -1, timezone);
       }
     }
 
@@ -759,9 +769,9 @@ class AnalyticsService {
 
     for (const date of dates.sort()) {
       if (lastDate) {
-        const last = new Date(lastDate);
-        const current = new Date(date);
-        const diffDays = (current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24);
+        const last = DateUtil.parseUserDate(lastDate, timezone);
+        const current = DateUtil.parseUserDate(date, timezone);
+        const diffDays = differenceInCalendarDays(current, last);
 
         if (diffDays === 1) {
           tempStreak++;
@@ -793,20 +803,21 @@ class AnalyticsService {
       .limit(365)
       .lean();
 
-    const uniqueDates = new Set(logs.map((log) => log.completedAt.toDateString()));
+    const user = await User.findById(userId).select('timezone');
+    const timezone = user?.timezone || 'UTC';
+    const uniqueDates = new Set(logs.map((log) => DateUtil.formatDateForUser(log.completedAt, timezone)));
     const dates = Array.from(uniqueDates).sort();
 
     let currentStreak = 0;
-    const today = new Date().toDateString();
+    const today = DateUtil.formatDateForUser(new Date(), timezone);
 
     if (uniqueDates.has(today)) {
       currentStreak = 1;
-      let checkDate = new Date();
-      checkDate.setDate(checkDate.getDate() - 1);
+      let checkDate = DateUtil.addDaysInTimezone(new Date(), -1, timezone);
 
-      while (uniqueDates.has(checkDate.toDateString())) {
+      while (uniqueDates.has(DateUtil.formatDateForUser(checkDate, timezone))) {
         currentStreak++;
-        checkDate.setDate(checkDate.getDate() - 1);
+        checkDate = DateUtil.addDaysInTimezone(checkDate, -1, timezone);
       }
     }
 
@@ -816,9 +827,9 @@ class AnalyticsService {
 
     for (const date of dates) {
       if (lastDate) {
-        const last = new Date(lastDate);
-        const current = new Date(date);
-        const diffDays = (current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24);
+        const last = DateUtil.parseUserDate(lastDate, timezone);
+        const current = DateUtil.parseUserDate(date, timezone);
+        const diffDays = differenceInCalendarDays(current, last);
 
         if (diffDays === 1) {
           tempStreak++;

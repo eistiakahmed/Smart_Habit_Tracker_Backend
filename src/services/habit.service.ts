@@ -235,14 +235,17 @@ class HabitService {
       });
 
       if (existingLog) {
-        // Remove the log (untoggle)
-        await HabitLog.deleteOne({ _id: existingLog._id });
+        await existingLog.deleteOne();
+        const streak = await this.getCurrentStreak(habitId, userId, timezone);
 
         logger.info(`Habit unmarked: ${habitId} by user ${userId}`);
 
         return {
-          log: null,
-          streak: await this.getCurrentStreak(habitId, userId, timezone),
+          log: {
+            ...existingLog.toObject(),
+            id: existingLog._id.toString(),
+          },
+          streak,
           todayCompleted: false,
         };
       }
@@ -358,12 +361,11 @@ class HabitService {
       let currentDate = periodStart;
 
       while (currentDate <= periodEnd) {
-        const isCompleted = completedDates.some((date) =>
-          DateUtil.isToday(date, timezone) && date.toDateString() === currentDate.toDateString()
-        );
+        const currentDateKey = DateUtil.formatDateForUser(currentDate, timezone);
+        const isCompleted = completedDates.some((date) => DateUtil.isSameDayInTimezone(date, currentDate, timezone));
 
         dailyProgress.push({
-          date: currentDate.toISOString().split('T')[0],
+          date: currentDateKey,
           completed: isCompleted,
         });
 
@@ -539,8 +541,8 @@ class HabitService {
       const rate = totalDays > 0 ? (completed / totalDays) * 100 : 0;
 
       weeks.push({
-        weekStart: weekStart.toISOString().split('T')[0],
-        weekEnd: weekEnd.toISOString().split('T')[0],
+        weekStart: DateUtil.formatDateForUser(weekStart, timezone),
+        weekEnd: DateUtil.formatDateForUser(weekEnd, timezone),
         completed,
         total: totalDays,
         rate: Math.round(rate),
