@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import habitDNAController from '@/controllers/habitDNA.controller';
 import { authenticate } from '@/middleware/auth.middleware';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All routes require authentication
 router.use(authenticate);
